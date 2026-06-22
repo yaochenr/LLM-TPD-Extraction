@@ -22,6 +22,7 @@ rdkit = ">=2025.3.2,<2026"
 pubchempy = ">=1.0.5,<2"
 tqdm = "*"
 pyyaml = "*"
+nbformat = ">=5.10.4,<6"
 
 [pypi-dependencies]
 marker-pdf = ">=1.6.2, <2"
