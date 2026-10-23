@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AutoTPD+</title>
+<meta name="description" content="AutoTPD+: targeted protein degradation assay records extracted from the literature by an agentic LLM workflow.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #111111;
+    --muted: #6b6b6b;
+    --line: #e6e6e6;
+    --hover: #f5f5f5;
+    --overlay: rgba(255, 255, 255, 0.55);
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  #universe {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 2.4s ease;
+  }
+  #universe.ready { opacity: 1; }
+  main { position: relative; text-align: center; max-width: 640px; }
+  /* A soft white field behind the text so it stays legible over the molecules. */
+  main::before {
+    content: "";
+    position: absolute;
+    inset: -90px -140px;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0));
+    pointer-events: none;
+  }
+  h1 {
+    font-size: clamp(48px, 10vw, 80px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  p.tagline {
+    margin-top: 20px;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--muted);
+    text-wrap: balance;
+  }
+  nav {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: var(--fg);
+    font: inherit;
+    font-size: 15px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn:hover { background: var(--hover); border-color: var(--muted); }
+  .btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+  dialog {
+    margin: auto;
+    width: min(440px, calc(100% - 32px));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--bg);
+    color: var(--fg);
+    padding: 0;
+  }
+  .box { padding: 24px; }
+  dialog { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08); }
+  dialog::backdrop {
+    background: var(--overlay);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+  .dialog-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .dialog-head h2 { font-size: 17px; font-weight: 600; }
+  .close {
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .close:hover { color: var(--fg); }
+  .close:focus { outline: none; }
+  .close:focus-visible { color: var(--fg); outline: 1px solid var(--line); outline-offset: 2px; border-radius: 6px; }
+  ul { list-style: none; }
+  li a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: var(--fg);
+    text-decoration: none;
+  }
+  li a:hover { background: var(--hover); }
+  .name { font-size: 15px; font-weight: 500; }
+  .size { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .group {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 12px 14px 4px;
+  }
+</style>
+</head>
+<body>
+<canvas id="universe" aria-hidden="true"></canvas>
+<main>
+  <h1>AutoTPD+</h1>
+  <p class="tagline">An expanded targeted protein degradation database of molecular glue and PROTAC assay records, extracted from the literature by an agentic LLM workflow.</p>
+  <nav>
+    <a class="btn" href="https://github.com/yaochenr/LLM-TPD-Extraction" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+    <a class="btn" href="https://arxiv.org/abs/2605.11221" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1.5A1.5 1.5 0 014.5 0h5.09a1.5 1.5 0 011.06.44l2.91 2.91A1.5 1.5 0 0114 4.41V14.5a1.5 1.5 0 01-1.5 1.5h-8A1.5 1.5 0 013 14.5v-13zM4.5 1a.5.5 0 00-.5.5v13a.5.5 0 00.5.5h8a.5.5 0 00.5-.5V5h-2.5A1.5 1.5 0 019 3.5V1H4.5zM10 1.2v2.3a.5.5 0 00.5.5h2.3L10 1.2zM5.5 8h5a.5.5 0 010 1h-5a.5.5 0 010-1zm0 2.5h5a.5.5 0 010 1h-5a.5.5 0 010-1z"/></svg>
+      Paper
+    </a>
+    <button class="btn" type="button" id="open-download">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1a.5.5 0 01.5.5v8.29l2.65-2.64a.5.5 0 01.7.7l-3.5 3.5a.5.5 0 01-.7 0l-3.5-3.5a.5.5 0 01.7-.7L7.5 9.79V1.5A.5.5 0 018 1zM2 13.5a.5.5 0 01.5-.5h11a.5.5 0 010 1h-11a.5.5 0 01-.5-.5z"/></svg>
+      Download
+    </button>
+  </nav>
+</main>
+
+<dialog id="download">
+<div class="box">
+  <div class="dialog-head">
+    <h2>Download dataset</h2>
+    <button class="close" type="button" aria-label="Close" id="close-download">&times;</button>
+  </div>
+  <ul>
+    <li class="group">AutoTPD+</li>
+    <li><a href="data/AutoTPDplus-PROTAC.csv" download>
+      <span class="name">AutoTPDplus-PROTAC.csv</span><span class="size">2,532 records · 4.5 MB</span></a></li>
+    <li><a href="data/AutoTPDplus-MG.csv" download>
+      <span class="name">AutoTPDplus-MG.csv</span><span class="size">618 records · 911 KB</span></a></li>
+    <li class="group">AutoTPD</li>
+    <li><a href="data/AutoTPD-PROTAC.csv" download>
+      <span class="name">AutoTPD-PROTAC.csv</span><span class="size">714 records · 1.2 MB</span></a></li>
+    <li><a href="data/AutoTPD-MG.csv" download>
+      <span class="name">AutoTPD-MG.csv</span><span class="size">246 records · 375 KB</span></a></li>
+  </ul>
+</div>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('download');
+  document.getElementById('open-download').addEventListener('click', () => dialog.showModal());
+  document.getElementById('close-download').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+</script>
+<script type="module" src="assets/universe.js?v=3d-3"></script>
+</body>
+</html>
