@@ -255,13 +255,12 @@ File groups:
 
 ## Citation
 
-If you use this workflow or dataset, please cite:
 ```bibtex
-@misc{anonymous2026tpdcurator,
-  title = {Beyond Manual Curation: Augmenting Targeted Protein Degradation Databases via Agentic Literature Extraction Workflows},
-  author = {Anonymous},
-  year = {2026},
-  note = {Anonymous submission}
+@article{rao2026beyond,
+  title={Beyond Manual Curation: Augmenting Targeted Protein Degradation Databases via Agentic Literature Extraction Workflows},
+  author={Rao, Yaochen and Jalalypour, Farzaneh and Krishnan, NM and Mercado, Rocío},
+  journal={arXiv preprint arXiv:2605.11221},
+  year={2026}
 }
 ```
 
